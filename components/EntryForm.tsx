@@ -1,21 +1,22 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { useStore } from '@/lib/store';
+import type { Draft } from '@/lib/draft';
 import { TABS, exclOf, parseMoney, sameInvoice, toIso, vatFor, zar, monthOf, type Entry, type Tab } from '@/lib/vat';
 
 const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Johannesburg' });
 
-export function EntryForm({ initial, defaultTab, onDone }: { initial?: Entry; defaultTab?: Tab; onDone?: () => void }) {
+export function EntryForm({ initial, defaultTab, prefill, onDone }: { initial?: Entry; defaultTab?: Tab; prefill?: Draft; onDone?: () => void }) {
   const { entries, save, month } = useStore();
   const [tab, setTab] = useState<Tab>(initial?.tab ?? defaultTab ?? 'SHOP');
-  const [date, setDate] = useState(initial?.date ?? (month === today().slice(0, 7) ? today() : `${month}-01`));
-  const [supplier, setSupplier] = useState(initial?.supplier.trim() ?? '');
-  const [invoice, setInvoice] = useState(initial?.invoice ?? '');
-  const [incl, setIncl] = useState(initial ? String(initial.incl || '') : '');
-  const [zero, setZero] = useState(initial ? String(initial.zero || '') : '');
+  const [date, setDate] = useState(initial?.date ?? (prefill?.date || null) ?? (month === today().slice(0, 7) ? today() : `${month}-01`));
+  const [supplier, setSupplier] = useState(initial?.supplier.trim() ?? prefill?.supplier ?? '');
+  const [invoice, setInvoice] = useState(initial?.invoice ?? prefill?.invoice ?? '');
+  const [incl, setIncl] = useState(initial ? String(initial.incl || '') : prefill?.incl ?? '');
+  const [zero, setZero] = useState(initial ? String(initial.zero || '') : prefill?.zero ?? '');
   const [imp, setImp] = useState(initial ? String(initial.importVat || '') : '');
-  const [tv, setTv] = useState(initial?.vat !== undefined ? String(initial.vat) : '');
-  const [tx, setTx] = useState(initial?.excl !== undefined ? String(initial.excl) : '');
+  const [tv, setTv] = useState(initial?.vat !== undefined ? String(initial.vat) : prefill?.vat ?? '');
+  const [tx, setTx] = useState(initial?.excl !== undefined ? String(initial.excl) : prefill?.excl ?? '');
   const [period, setPeriod] = useState(initial?.period ?? '');
   const [err, setErr] = useState('');
   const [msg, setMsg] = useState('');
