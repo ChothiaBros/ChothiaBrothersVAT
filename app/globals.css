@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --ink: 22 35 63;              /* #16233F */
+  --surface: 245 248 251;        /* #F5F8FB */
+  --surface-raised: 255 255 255; /* #FFFFFF */
+  --border: 220 228 238;         /* #DCE4EE */
+  --primary: 30 136 199;         /* #1E88C7 */
+  --primary-dark: 18 93 140;     /* #125D8C */
+
+}
+
+.dark {
+  --ink: 226 232 240;             /* light text on dark bg */
+  --surface: 15 21 33;             /* deep navy background */
+  --surface-raised: 24 32 48;      /* slightly lighter panels */
+  --border: 40 51 71;
+  --primary: 56 160 224;           /* brighter blue for contrast on dark */
+  --primary-dark: 30 136 199;
+
+}
+
+/* Always-light scope: screens built on fixed white/pastel cards (the order
+   desk) must not pick up dark-mode ink, which would be light text on white. */
+
+body { @apply bg-surface text-ink antialiased; }
+.card { @apply rounded-xl border border-border bg-surfaceRaised shadow-sm; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primaryDark disabled:opacity-50; }
+.btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surfaceRaised px-3 py-2 text-sm font-medium hover:bg-surface; }
+.input { @apply w-full rounded-lg border border-border bg-surfaceRaised px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20; }
+.lbl { @apply mb-1 block text-xs font-semibold uppercase tracking-wide opacity-70; }
+.num { font-variant-numeric: tabular-nums; }

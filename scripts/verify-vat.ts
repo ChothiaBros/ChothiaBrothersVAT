@@ -1,0 +1,17 @@
+import { vatOf, exclOf, toIso, parseMoney, report, totals, sameInvoice, type Entry } from '../lib/vat';
+let fail = 0;
+const ok = (c: boolean, m: string) => { if (!c) { fail++; console.log('FAIL', m); } else console.log('ok  ', m); };
+const near = (a: number, b: number) => Math.abs(a - b) < 0.005;
+ok(near(vatOf(24784.85), 3232.81), 'VAT of R24,784.85 incl is 3,232.81 (sheet: E7*15/115)');
+ok(near(exclOf(115), 100) && near(vatOf(115), 15), '115 incl = 100 excl + 15 VAT');
+ok(toIso('20/07/2026') === '2026-07-20', 'dd/mm/yyyy');
+ok(toIso('31/02/2026') === null, 'impossible date refused');
+ok(toIso('2026-08-11') === '2026-08-11', 'iso date');
+ok(parseMoney('1,234.50') === 1234.5 && parseMoney('0,42') === 0.42 && parseMoney('abc') === null, 'money parsing');
+const e = (tab: Entry['tab'], incl: number, importVat = 0): Entry => ({ id: Math.random() + '', tab, date: '2026-08-01', supplier: 'S', invoice: 'I', incl, zero: 0, importVat });
+const r = report({ gross: 1000, vat: 130.43, zero: 0 }, [e('SHOP', 115), e('OPERATING', 230, 5)]);
+ok(near(r.inputVat, 45) && near(r.importVat, 5) && near(r.payable, 130.43 - 50), 'payable = sales VAT - (input VAT + import VAT)');
+ok(near(totals([]).vat, 0), 'empty month totals zero');
+ok(sameInvoice({ ...e('SHOP', 1), id: 'a', supplier: 'AF TEXTILE ', invoice: 'IN1' }, { ...e('SHOP', 1), id: 'b', supplier: 'af textile', invoice: 'in1' }), 'duplicate invoice detected');
+ok(near(totals([{ ...e('SHOP', 0), vat: 573, excl: 111196.01 }, e('SHOP', 115)]).vat, 588) && near(totals([{ ...e('SHOP', 0), vat: 573, excl: 111196.01 }]).excl, 111196.01), 'typed VAT and excl on an invoice with no incl figure are kept');
+process.exit(fail ? 1 : 0);

@@ -1,0 +1,10 @@
+import { readFileSync } from 'fs';
+import { importWorkbook, exportMonth } from '../lib/excel';
+import { report, totals, periodOf } from '../lib/vat';
+const f = process.argv[2];
+const b = readFileSync(f); const imp = importWorkbook(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) as ArrayBuffer);
+const by = (t: string) => imp.entries.filter(e => e.tab === t);
+console.log('shop', by('SHOP').length, 'op', by('OPERATING').length, 'imp', by('IMPROVEMENTS').length, 'skipped', imp.skipped, 'sales', imp.sales);
+const r = report(imp.sales['2026-08'] ?? { gross: 0, vat: 0, zero: 0 }, imp.entries.filter(e => periodOf(e) === '2026-08'));
+console.log('shop vat', totals(by('SHOP')).vat.toFixed(2), 'op vat', totals(by('OPERATING')).vat.toFixed(2), 'op zero', totals(by('OPERATING')).zero, 'payable', r.payable.toFixed(2));
+console.log(by('SHOP').slice(0, 2), by('OPERATING').slice(-2));
